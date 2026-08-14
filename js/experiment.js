@@ -75,7 +75,7 @@ timeline.push(
 // ------------------------------------------
 
 timeline.push(
-    loadPage("instructions/consent.html")
+    loadPage("instructions/consent.html", true)
 );
 
 // ------------------------------------------
@@ -99,15 +99,6 @@ timeline.push(
         true
     )
 );
-
-// ------------------------------------------
-// Questionnaire page
-// ------------------------------------------
-
-timeline.push(
-    loadPage("instructions/questionnaire.html")
-);
-
 
 // ------------------------------------------
 // Finish page

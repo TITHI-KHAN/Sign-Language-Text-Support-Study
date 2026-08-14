@@ -1,13 +1,160 @@
 body{
-
-    max-width:1100px;
-
-    margin:auto;
-
-    padding:40px;
-
     font-family:Arial, Helvetica, sans-serif;
+}
 
+.jspsych-display-element {
+    color: #17191d;
+}
+
+.jspsych-content-wrapper {
+    align-items: flex-start;
+    padding: 18px 32px 48px;
+}
+
+.welcome-screen {
+    width: min(100%, 1020px);
+    margin: 0 auto;
+    text-align: center;
+    font-size: 20px;
+    line-height: 1.55;
+}
+
+.welcome-screen h1 {
+    margin: 0 0 26px;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.welcome-screen p {
+    width: min(100%, 930px);
+    margin: 0 auto 38px;
+    line-height: inherit;
+    text-align: left;
+}
+
+.welcome-screen ol {
+    width: min(100%, 930px);
+    box-sizing: border-box;
+    margin: 0 auto 39px;
+    padding-left: 42px;
+    text-align: left;
+}
+
+.welcome-screen li {
+    margin-bottom: 9px;
+    padding-left: 10px;
+}
+
+.welcome-screen strong {
+    font-weight: 700;
+}
+
+.welcome-actions {
+    margin-top: 42px;
+    text-align: center;
+}
+
+.welcome-screen .jspsych-btn {
+    margin: 0;
+    padding: 12px 44px;
+    border: 2px solid #2f80ed;
+    border-radius: 12px;
+    background: #fff;
+    color: #1675f8;
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1.25;
+    box-shadow: none;
+}
+
+.welcome-screen .jspsych-btn:hover,
+.welcome-screen .jspsych-btn:focus-visible {
+    background: #f4f8ff;
+    border-color: #1268d3;
+    color: #1268d3;
+}
+
+.consent-screen {
+    width: min(100%, 930px);
+    margin: 0 auto;
+    color: #17191d;
+    font-size: 20px;
+    line-height: 1.55;
+    text-align: left;
+}
+
+.consent-screen h1 {
+    margin: 0 0 30px;
+    font-size: 40px;
+    text-align: center;
+}
+
+.consent-screen h2 {
+    margin: 28px 0 8px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.consent-screen p {
+    margin: 0;
+}
+
+.consent-check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-top: 34px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.consent-check input {
+    width: 20px;
+    height: 20px;
+    margin-top: 5px;
+    flex: 0 0 auto;
+}
+
+.consent-actions {
+    margin-top: 34px;
+    text-align: center;
+}
+
+.consent-actions .jspsych-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+@media (max-width: 800px) {
+    .jspsych-content-wrapper {
+        padding: 16px 22px 36px;
+    }
+
+    .welcome-screen {
+        font-size: 17px;
+    }
+
+    .welcome-screen h1 {
+        margin-bottom: 22px;
+        font-size: 36px;
+    }
+
+    .welcome-screen p {
+        margin-bottom: 28px;
+    }
+
+    .welcome-screen ol {
+        padding-left: 31px;
+    }
+
+    .consent-screen {
+        font-size: 17px;
+    }
+
+    .consent-screen h1 {
+        font-size: 34px;
+    }
 }
 
 img{

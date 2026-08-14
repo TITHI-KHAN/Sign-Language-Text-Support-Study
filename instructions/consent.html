@@ -1,0 +1,40 @@
+<main class="consent-screen">
+    <h1>Consent to Participate</h1>
+
+    <p>
+        You are invited to take part in a study about how sign language video support
+        may assist people while reading written text.
+    </p>
+
+    <h2>What you will do</h2>
+    <p>
+        You will review examples of a reading interface, use the interface, and answer
+        questions about your experience.
+    </p>
+
+    <h2>Voluntary participation</h2>
+    <p>
+        Taking part is voluntary. You may choose not to participate or stop at any time.
+        Please ask the researcher if you have questions about the study before continuing.
+    </p>
+
+    <label class="consent-check">
+        <input type="checkbox" id="consent-agree">
+        <span>I have read the information above and agree to participate.</span>
+    </label>
+
+    <div class="consent-actions">
+        <button class="jspsych-btn" id="start" disabled>Continue</button>
+    </div>
+</main>
+
+<script>
+(function () {
+    const checkbox = document.getElementById('consent-agree');
+    const continueButton = document.getElementById('start');
+
+    checkbox.addEventListener('change', function () {
+        continueButton.disabled = !checkbox.checked;
+    });
+})();
+</script>

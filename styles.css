@@ -1,0 +1,105 @@
+body{
+
+    max-width:1100px;
+
+    margin:auto;
+
+    padding:40px;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+img{
+
+    max-width:100%;
+
+    border-radius:8px;
+
+}
+
+.gif-grid{
+
+    display:grid;
+
+    gap:30px;
+
+    margin-top:25px;
+
+}
+
+.two-column{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.three-column{
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+.four-column{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.tutorial-slide{
+
+    display:none;
+
+}
+
+.tutorial-slide.active{
+
+    display:block;
+
+}
+
+.tutorial-navigation{
+
+    margin-top:40px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.tutorial-finish{
+
+    text-align:center;
+
+    margin-top:30px;
+
+}
+
+.jspsych-btn{
+
+    font-size:18px;
+
+    padding:10px 28px;
+
+}
+
+h1{
+
+    margin-bottom:25px;
+
+}
+
+h3{
+
+    margin-bottom:10px;
+
+}
+
+p{
+
+    line-height:1.6;
+
+}

@@ -1,0 +1,244 @@
+<div class="tutorial-wrapper">
+
+    <!-- Slide 1: Location -->
+    <section class="tutorial-slide active">
+        <h1>Location</h1>
+
+        <p>
+            Location controls where the sign language video appears while you are reading.
+        </p>
+
+        <div class="gif-grid two-column">
+            <div>
+                <h3>Popup</h3>
+                <img src="../gifs/popup.gif"
+                     alt="Popup location demonstration">
+            </div>
+
+            <div>
+                <h3>Side</h3>
+                <img src="../gifs/side.gif"
+                     alt="Side location demonstration">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Slide 2: Video Segmentation -->
+    <section class="tutorial-slide">
+        <h1>Video Segmentation</h1>
+
+        <p>
+            Video Segmentation controls how much of the sign language video is shown.
+        </p>
+
+        <div class="gif-grid four-column">
+
+            <div>
+                <h3>Word</h3>
+                <img src="../gifs/word.gif"
+                     alt="Word video segmentation demonstration">
+            </div>
+
+            <div>
+                <h3>Sentence</h3>
+                <img src="../gifs/sentence.gif"
+                     alt="Sentence video segmentation demonstration">
+            </div>
+
+            <div>
+                <h3>Paragraph</h3>
+                <img src="../gifs/paragraph.gif"
+                     alt="Paragraph video segmentation demonstration">
+            </div>
+
+            <div>
+                <h3>Full Text</h3>
+                <img src="../gifs/fulltext.gif"
+                     alt="Full text video segmentation demonstration">
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Slide 3: Linking Granularity -->
+    <section class="tutorial-slide">
+        <h1>Linking Granularity</h1>
+
+        <p>
+            Linking Granularity controls which portions of the written text correspond
+            to positions within the sign language video.
+        </p>
+
+        <div class="gif-grid four-column">
+
+            <div>
+                <h3>Word</h3>
+                <img src="../gifs/linking-word.gif"
+                     alt="Word linking granularity demonstration">
+            </div>
+
+            <div>
+                <h3>Sentence</h3>
+                <img src="../gifs/linking-sentence.gif"
+                     alt="Sentence linking granularity demonstration">
+            </div>
+
+            <div>
+                <h3>Paragraph</h3>
+                <img src="../gifs/linking-paragraph.gif"
+                     alt="Paragraph linking granularity demonstration">
+            </div>
+
+            <div>
+                <h3>Full Text</h3>
+                <img src="../gifs/linking-fulltext.gif"
+                     alt="Full text linking granularity demonstration">
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Slide 4: Navigation -->
+    <section class="tutorial-slide">
+        <h1>Navigation</h1>
+
+        <p>
+            Navigation controls how the written text and sign language video
+            interact with each other.
+        </p>
+
+        <div class="gif-grid three-column">
+
+            <div>
+                <h3>Interactive Text</h3>
+                <img src="../gifs/interactive-text.gif"
+                     alt="Interactive Text navigation demonstration">
+            </div>
+
+            <div>
+                <h3>Both</h3>
+                <img src="../gifs/both.gif"
+                     alt="Both navigation demonstration">
+            </div>
+
+            <div>
+                <h3>Interactive Video</h3>
+                <img src="../gifs/interactive-video.gif"
+                     alt="Interactive Video navigation demonstration">
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Navigation -->
+    <div class="tutorial-navigation">
+
+        <button type="button"
+                id="tutorial-prev"
+                class="jspsych-btn">
+            Previous
+        </button>
+
+        <span id="tutorial-progress">
+            1 of 4
+        </span>
+
+        <button type="button"
+                id="tutorial-next"
+                class="jspsych-btn">
+            Next
+        </button>
+
+    </div>
+
+    <!-- This button is hidden until the last slide -->
+    <div class="tutorial-finish">
+        <button id="start"
+                class="jspsych-btn"
+                style="display:none;">
+            Continue
+        </button>
+    </div>
+
+</div>
+
+<script>
+(function () {
+
+    const slides =
+        document.querySelectorAll('.tutorial-slide');
+
+    const previousButton =
+        document.getElementById('tutorial-prev');
+
+    const nextButton =
+        document.getElementById('tutorial-next');
+
+    const continueButton =
+        document.getElementById('start');
+
+    const progress =
+        document.getElementById('tutorial-progress');
+
+    let currentSlide = 0;
+
+
+    function updateSlide() {
+
+        slides.forEach((slide, index) => {
+            slide.classList.toggle(
+                'active',
+                index === currentSlide
+            );
+        });
+
+
+        progress.textContent =
+            `${currentSlide + 1} of ${slides.length}`;
+
+
+        previousButton.disabled =
+            currentSlide === 0;
+
+
+        const isLastSlide =
+            currentSlide === slides.length - 1;
+
+
+        nextButton.style.display =
+            isLastSlide ? 'none' : 'inline-block';
+
+
+        continueButton.style.display =
+            isLastSlide ? 'inline-block' : 'none';
+    }
+
+
+    previousButton.addEventListener('click', () => {
+
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
+        }
+
+    });
+
+
+    nextButton.addEventListener('click', () => {
+
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            updateSlide();
+        }
+
+    });
+
+
+    updateSlide();
+
+})();
+</script>

@@ -1,0 +1,86 @@
+<div class="text-left max-w-3xl mx-auto font-sans text-base leading-relaxed">
+
+    <h1 class="text-2xl font-semibold mt-6 mb-4">
+        Try the Reading Support Tool
+    </h1>
+
+    <p class="mb-4">
+        You have now completed the introduction to the interface.
+    </p>
+
+    <p class="mb-4">
+        In the next step, you will use the reading support tool yourself.
+    </p>
+
+    <p class="mb-4">
+        Please complete the assigned task using the prototype.
+    </p>
+
+    <p class="mb-4">
+        When you finish,
+        <strong>close only the prototype tab</strong>
+        and return to this study.
+    </p>
+
+    <div class="text-center mt-5">
+
+        <button
+            id="openPrototype"
+            class="jspsych-btn">
+
+            Open Prototype
+
+        </button>
+
+    </div>
+
+    <div
+        id="continueSection"
+        style="display:none; margin-top:40px;"
+        class="text-center">
+
+        <p>
+            Return here after completing the task.
+        </p>
+
+        <button
+            id="start"
+            class="jspsych-btn">
+
+            Continue
+
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const prototypeButton =
+    document.getElementById("openPrototype");
+
+const continueSection =
+    document.getElementById("continueSection");
+
+prototypeButton.addEventListener("click", () => {
+
+    window.open(
+
+        "https://tithi-khan.github.io/Sign-Language-Text-Support-Version-2-/",
+
+        "_blank"
+
+    );
+
+    prototypeButton.disabled = true;
+
+    prototypeButton.textContent =
+        "Prototype Opened";
+
+    continueSection.style.display =
+        "block";
+
+});
+
+</script>

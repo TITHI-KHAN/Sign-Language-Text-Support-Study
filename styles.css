@@ -100,30 +100,9 @@ body{
     margin: 0;
 }
 
-.consent-check {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    margin-top: 34px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.consent-check input {
-    width: 20px;
-    height: 20px;
-    margin-top: 5px;
-    flex: 0 0 auto;
-}
-
 .consent-actions {
     margin-top: 34px;
     text-align: center;
-}
-
-.consent-actions .jspsych-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
 }
 
 @media (max-width: 800px) {

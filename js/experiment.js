@@ -48,11 +48,13 @@ const timeline = [];
 
 function loadPage(url, executeScript = false) {
 
+    const versionedUrl = `${url}?v=20260814-1`;
+
     return {
 
         type: jsPsychExternalHtml,
 
-        url: url,
+        url: versionedUrl,
 
         cont_btn: "start",
 
@@ -75,7 +77,7 @@ timeline.push(
 // ------------------------------------------
 
 timeline.push(
-    loadPage("instructions/consent.html", true)
+    loadPage("instructions/consent.html")
 );
 
 // ------------------------------------------

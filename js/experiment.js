@@ -9,6 +9,9 @@ function getParam(name) {
 
 const participantID = getParam("pid");
 
+const submissionUrl =
+    "https://dgdflklwjkcndvkvakpp.supabase.co/functions/v1/submit-study";
+
 if (!participantID) {
     document.body.innerHTML =
         "<h2>Participant ID is missing.</h2>";
@@ -25,16 +28,54 @@ const jsPsych = initJsPsych({
 
     auto_update_progress_bar: true,
 
-    on_finish: () => {
-
-        jsPsych.data.get().localSave(
-            "csv",
-            `participant_${participantID}.csv`
-        );
-
-    }
+    on_finish: submitStudyData
 
 });
+
+async function submitStudyData() {
+    document.body.innerHTML = `
+        <main class="submission-screen">
+            <h1>Submitting your responses…</h1>
+            <p>Please keep this page open.</p>
+        </main>
+    `;
+
+    try {
+        const response = await fetch(submissionUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                participant_id: participantID,
+                csv: jsPsych.data.get().csv()
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Submission failed (${response.status})`);
+        }
+
+        document.body.innerHTML = `
+            <main class="submission-screen">
+                <h1>Thank You!</h1>
+                <p>Your responses were submitted successfully.</p>
+                <p>You may now close this tab.</p>
+            </main>
+        `;
+    } catch (error) {
+        console.error(error);
+        document.body.innerHTML = `
+            <main class="submission-screen">
+                <h1>We could not submit your responses</h1>
+                <p>Please keep this page open and ask the researcher for help.</p>
+                <button id="retrySubmission" class="jspsych-btn">Try Again</button>
+            </main>
+        `;
+
+        document
+            .getElementById("retrySubmission")
+            .addEventListener("click", submitStudyData);
+    }
+}
 
 // ------------------------------------------
 // Timeline

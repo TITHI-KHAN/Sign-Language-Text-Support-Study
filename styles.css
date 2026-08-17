@@ -2,6 +2,13 @@ body{
     font-family:Arial, Helvetica, sans-serif;
 }
 
+.submission-screen {
+    max-width: 48rem;
+    margin: 5rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
 .jspsych-display-element {
     color: #17191d;
 }

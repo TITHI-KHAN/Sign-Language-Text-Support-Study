@@ -10,10 +10,12 @@ function isAllowedOrigin(origin: string | null) {
 }
 
 function corsHeaders(origin: string | null) {
+  const allowedOrigin = origin && isAllowedOrigin(origin)
+    ? origin
+    : productionOrigin;
+
   return {
-    "Access-Control-Allow-Origin": isAllowedOrigin(origin)
-      ? origin
-      : productionOrigin,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Vary": "Origin",
@@ -62,8 +64,11 @@ Deno.serve(async (request) => {
       throw bucketError;
     }
 
-    const timestamp = new Date().toISOString().replaceAll(":", "-");
-    const filename = `participant_${participantId}_${timestamp}.csv`;
+    // Participant IDs are case-insensitive. A stable filename, together with
+    // upsert: false, makes Storage enforce one response per participant even
+    // when two submissions arrive at nearly the same time.
+    const normalizedParticipantId = participantId.toLowerCase();
+    const filename = `participant_${normalizedParticipantId}.csv`;
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(
@@ -72,7 +77,25 @@ Deno.serve(async (request) => {
         { upsert: false },
       );
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      const statusCode = Number(
+        (uploadError as { statusCode?: string | number }).statusCode,
+      );
+      const message = uploadError.message.toLowerCase();
+
+      if (
+        statusCode === 409 ||
+        message.includes("already exists") ||
+        message.includes("duplicate")
+      ) {
+        return new Response("Participant ID has already submitted", {
+          status: 409,
+          headers,
+        });
+      }
+
+      throw uploadError;
+    }
 
     return Response.json({ ok: true }, { headers });
   } catch (error) {

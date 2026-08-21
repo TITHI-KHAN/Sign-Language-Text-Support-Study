@@ -50,6 +50,17 @@ async function submitStudyData() {
             })
         });
 
+        if (response.status === 409) {
+            document.body.innerHTML = `
+                <main class="submission-screen">
+                    <h1>Response Already Submitted</h1>
+                    <p>This participant ID has already been used to submit a response.</p>
+                    <p>Please ask the researcher for help if you believe this is an error.</p>
+                </main>
+            `;
+            return;
+        }
+
         if (!response.ok) {
             throw new Error(`Submission failed (${response.status})`);
         }

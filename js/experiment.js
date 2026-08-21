@@ -1,3 +1,8 @@
+import {
+    logPrototypeInteraction,
+    submitStudy
+} from "./firebase.js";
+
 // ------------------------------------------
 // Read Participant ID
 // ------------------------------------------
@@ -8,15 +13,71 @@ function getParam(name) {
 }
 
 const participantID = getParam("pid");
+const sessionID = sessionStorage.getItem("study_session_id");
+const prototypeOrigin = "https://tithi-khan.github.io";
+let prototypeSequence = 0;
 
-const submissionUrl =
-    "https://dgdflklwjkcndvkvakpp.supabase.co/functions/v1/submit-study";
+window.studyParticipantID = participantID;
+window.studySessionID = sessionID;
 
-if (!participantID) {
+if (!participantID || !sessionID) {
     document.body.innerHTML =
-        "<h2>Participant ID is missing.</h2>";
-    throw new Error("Missing participant ID");
+        "<h2>Your study session is missing. Please return to the participant ID page.</h2>";
+    throw new Error("Missing participant ID or session ID");
 }
+
+window.addEventListener("message", async (event) => {
+    if (event.origin !== prototypeOrigin) return;
+    if (event.source !== window.prototypeStudyWindow) return;
+    if (event.data?.type !== "prototype-interaction") return;
+
+    const interaction = event.data.interaction;
+
+    if (!interaction || typeof interaction.action !== "string") return;
+
+    const sequence = ++prototypeSequence;
+    const occurredAt = interaction.occurred_at ||
+        new Date().toISOString();
+    const eventData = {
+        participant_id: participantID.toLowerCase(),
+        session_id: sessionID,
+        trial_type: "prototype_interaction",
+        event_type: interaction.action,
+        feature: interaction.feature || "",
+        value: interaction.value || "",
+        target_type: interaction.target_type || "",
+        target_value: interaction.target_value || "",
+        occurred_at: occurredAt,
+        interaction_sequence: sequence,
+        prototype_state: JSON.stringify(
+            interaction.state || {}
+        )
+    };
+
+    jsPsych.data.write(eventData);
+
+    try {
+        await logPrototypeInteraction({
+            participantId: participantID,
+            sessionId: sessionID,
+            sequence,
+            interaction: {
+                ...interaction,
+                occurred_at: occurredAt
+            }
+        });
+
+        event.source.postMessage(
+            {
+                type: "prototype-interaction-ack",
+                sequence
+            },
+            prototypeOrigin
+        );
+    } catch (error) {
+        console.error("Could not back up prototype event", error);
+    }
+});
 
 // ------------------------------------------
 // Initialize jsPsych
@@ -41,29 +102,11 @@ async function submitStudyData() {
     `;
 
     try {
-        const response = await fetch(submissionUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                participant_id: participantID,
-                csv: jsPsych.data.get().csv()
-            })
+        await submitStudy({
+            participantId: participantID,
+            sessionId: sessionID,
+            csv: jsPsych.data.get().csv()
         });
-
-        if (response.status === 409) {
-            document.body.innerHTML = `
-                <main class="submission-screen">
-                    <h1>Response Already Submitted</h1>
-                    <p>This participant ID has already been used to submit a response.</p>
-                    <p>Please ask the researcher for help if you believe this is an error.</p>
-                </main>
-            `;
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(`Submission failed (${response.status})`);
-        }
 
         document.body.innerHTML = `
             <main class="submission-screen">
@@ -74,6 +117,18 @@ async function submitStudyData() {
         `;
     } catch (error) {
         console.error(error);
+
+        if (error.code === "functions/already-exists") {
+            document.body.innerHTML = `
+                <main class="submission-screen">
+                    <h1>Response Already Submitted</h1>
+                    <p>This participant ID has already been used to submit a response.</p>
+                    <p>Please ask the researcher for help if you believe this is an error.</p>
+                </main>
+            `;
+            return;
+        }
+
         document.body.innerHTML = `
             <main class="submission-screen">
                 <h1>We could not submit your responses</h1>

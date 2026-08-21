@@ -65,12 +65,22 @@ const continueSection =
 
 prototypeButton.addEventListener("click", () => {
 
-    window.open(
+    const prototypeUrl = new URL(
+        "https://tithi-khan.github.io/Sign-Language-Text-Support-Version-2-/"
+    );
 
-        "https://tithi-khan.github.io/Sign-Language-Text-Support-Version-2-/",
+    prototypeUrl.searchParams.set(
+        "pid",
+        window.studyParticipantID
+    );
+    prototypeUrl.searchParams.set(
+        "session",
+        window.studySessionID
+    );
 
+    window.prototypeStudyWindow = window.open(
+        prototypeUrl.toString(),
         "_blank"
-
     );
 
     prototypeButton.disabled = true;

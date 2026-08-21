@@ -7,9 +7,10 @@ The study uses Supabase for two related data paths:
 - Each meaningful prototype action is backed up immediately in the private
   `prototype_interactions` Postgres table.
 
-Prototype interaction rows are also written into jsPsych, so the final CSV
-contains the study trials and timestamped prototype events together. The table
-is a recovery source if a participant closes the study before final submission.
+At final submission, the Edge Function retrieves the session's backed-up
+interaction rows and merges them into the jsPsych CSV. The final file therefore
+contains study trials and timestamped prototype events together. The table is
+also a recovery source if a participant closes the study before submission.
 
 Participant IDs are case-insensitive. For example, `P2` and `p2` use the same
 CSV filename, and a repeated final submission is rejected without overwriting

@@ -150,6 +150,7 @@ async function submitStudyData() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 participant_id: participantID,
+                session_id: sessionID,
                 csv: jsPsych.data.get().csv()
             })
         });

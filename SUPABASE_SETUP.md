@@ -38,19 +38,26 @@ access. Only the validating Edge Function writes interaction rows.
 ## Retrieve data
 
 - Final combined CSV: **Storage → study-responses**
-- Immediate interaction backup: **Table Editor → prototype_interactions**
+- Temporary interaction buffer: **Table Editor → prototype_interactions**
 
 Interaction rows are ordered using `participant_id`, `session_id`, and
 `sequence`. `occurred_at` is the browser timestamp; `received_at` is the
 Supabase server timestamp.
 
+At final submission, `submit-study` merges those ordered interactions into the
+participant's single CSV in Storage. After the CSV is safely stored, it removes
+that session's temporary rows from `prototype_interactions`.
+
 ## Test before recruitment
 
 1. Start a study with a new test ID and open the prototype.
 2. Select several settings and text/video controls.
-3. Confirm rows appear in `prototype_interactions` with increasing sequences.
+3. Confirm rows temporarily appear in `prototype_interactions` with increasing
+   sequences.
 4. Finish the study and download its CSV.
 5. Confirm the CSV contains rows where `trial_type` is
    `prototype_interaction`.
-6. Submit again using a case variant of the same ID and confirm the duplicate
+6. Confirm that participant's temporary interaction rows are no longer in the
+   table.
+7. Submit again using a case variant of the same ID and confirm the duplicate
    response screen appears.

@@ -225,6 +225,20 @@ Deno.serve(async (request) => {
       throw uploadError;
     }
 
+    // Keep interaction rows only as a reliable buffer while the study runs.
+    // The combined participant CSV becomes the permanent research record.
+    const { error: cleanupError } = await supabase
+      .from("prototype_interactions")
+      .delete()
+      .eq("participant_id", normalizedParticipantId)
+      .eq("session_id", sessionId);
+
+    // The CSV is already safely stored, so a cleanup problem must not make the
+    // participant retry and encounter the duplicate-submission protection.
+    if (cleanupError) {
+      console.error("Interaction cleanup failed", cleanupError);
+    }
+
     return Response.json({ ok: true }, { headers });
   } catch (error) {
     console.error(error);

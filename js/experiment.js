@@ -1,8 +1,3 @@
-import {
-    logPrototypeInteraction,
-    submitStudy
-} from "./firebase.js";
-
 // ------------------------------------------
 // Read Participant ID
 // ------------------------------------------
@@ -16,6 +11,13 @@ const participantID = getParam("pid");
 const sessionID = sessionStorage.getItem("study_session_id");
 const prototypeOrigin = "https://tithi-khan.github.io";
 let prototypeSequence = 0;
+const prototypeEventSequences = new Map();
+const prototypeEventUploads = new Set();
+const supabaseFunctionsBase =
+    "https://dgdflklwjkcndvkvakpp.supabase.co/functions/v1";
+const submissionUrl = `${supabaseFunctionsBase}/submit-study`;
+const interactionUrl =
+    `${supabaseFunctionsBase}/log-prototype-interaction`;
 
 window.studyParticipantID = participantID;
 window.studySessionID = sessionID;
@@ -30,12 +32,30 @@ window.addEventListener("message", async (event) => {
     if (event.origin !== prototypeOrigin) return;
     if (event.source !== window.prototypeStudyWindow) return;
     if (event.data?.type !== "prototype-interaction") return;
+    if (event.data.participant_id !== participantID.toLowerCase()) return;
+    if (event.data.session_id !== sessionID) return;
 
     const interaction = event.data.interaction;
 
     if (!interaction || typeof interaction.action !== "string") return;
+    if (!/^[0-9a-f-]{36}$/i.test(interaction.event_id || "")) return;
+    const firstReceipt = !prototypeEventSequences.has(
+        interaction.event_id
+    );
+    let sequence;
 
-    const sequence = ++prototypeSequence;
+    if (firstReceipt) {
+        sequence = ++prototypeSequence;
+        prototypeEventSequences.set(
+            interaction.event_id,
+            sequence
+        );
+    } else {
+        sequence = prototypeEventSequences.get(
+            interaction.event_id
+        );
+    }
+
     const occurredAt = interaction.occurred_at ||
         new Date().toISOString();
     const eventData = {
@@ -47,35 +67,58 @@ window.addEventListener("message", async (event) => {
         value: interaction.value || "",
         target_type: interaction.target_type || "",
         target_value: interaction.target_value || "",
+        segment_start: interaction.segment_start || "",
+        segment_end: interaction.segment_end || "",
+        video_time: interaction.video_time ?? "",
         occurred_at: occurredAt,
+        interaction_event_id: interaction.event_id,
         interaction_sequence: sequence,
         prototype_state: JSON.stringify(
             interaction.state || {}
         )
     };
 
-    jsPsych.data.write(eventData);
+    if (firstReceipt) {
+        jsPsych.data.write(eventData);
+    }
+
+    if (prototypeEventUploads.has(interaction.event_id)) return;
+
+    prototypeEventUploads.add(interaction.event_id);
 
     try {
-        await logPrototypeInteraction({
-            participantId: participantID,
-            sessionId: sessionID,
-            sequence,
-            interaction: {
-                ...interaction,
-                occurred_at: occurredAt
-            }
+        const response = await fetch(interactionUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                participant_id: participantID,
+                session_id: sessionID,
+                sequence,
+                interaction: {
+                    ...interaction,
+                    occurred_at: occurredAt
+                }
+            })
         });
+
+        if (!response.ok) {
+            throw new Error(
+                `Interaction backup failed (${response.status})`
+            );
+        }
 
         event.source.postMessage(
             {
                 type: "prototype-interaction-ack",
+                event_id: interaction.event_id,
                 sequence
             },
             prototypeOrigin
         );
     } catch (error) {
         console.error("Could not back up prototype event", error);
+    } finally {
+        prototypeEventUploads.delete(interaction.event_id);
     }
 });
 
@@ -102,11 +145,29 @@ async function submitStudyData() {
     `;
 
     try {
-        await submitStudy({
-            participantId: participantID,
-            sessionId: sessionID,
-            csv: jsPsych.data.get().csv()
+        const response = await fetch(submissionUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                participant_id: participantID,
+                csv: jsPsych.data.get().csv()
+            })
         });
+
+        if (response.status === 409) {
+            document.body.innerHTML = `
+                <main class="submission-screen">
+                    <h1>Response Already Submitted</h1>
+                    <p>This participant ID has already been used to submit a response.</p>
+                    <p>Please ask the researcher for help if you believe this is an error.</p>
+                </main>
+            `;
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Submission failed (${response.status})`);
+        }
 
         document.body.innerHTML = `
             <main class="submission-screen">
@@ -117,17 +178,6 @@ async function submitStudyData() {
         `;
     } catch (error) {
         console.error(error);
-
-        if (error.code === "functions/already-exists") {
-            document.body.innerHTML = `
-                <main class="submission-screen">
-                    <h1>Response Already Submitted</h1>
-                    <p>This participant ID has already been used to submit a response.</p>
-                    <p>Please ask the researcher for help if you believe this is an error.</p>
-                </main>
-            `;
-            return;
-        }
 
         document.body.innerHTML = `
             <main class="submission-screen">

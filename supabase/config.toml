@@ -1,0 +1,5 @@
+[functions.submit-study]
+verify_jwt = false
+
+[functions.log-prototype-interaction]
+verify_jwt = false
